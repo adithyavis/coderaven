@@ -37,6 +37,7 @@ export function currentCommit(): string {
 }
 
 export function detectBaseBranch(): string {
+  git(["fetch", "--quiet", "origin"], { allowFail: true });
   const candidates = ["origin/main", "origin/master", "main", "master"];
   for (const c of candidates) {
     const out = git(["rev-parse", "--verify", "--quiet", c], { allowFail: true });
