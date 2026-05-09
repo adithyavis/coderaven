@@ -1,0 +1,31 @@
+{
+  "name": "coderaven",
+  "version": "0.1.0",
+  "description": "Local, git-syncable code review wrapper around Claude Code",
+  "bin": {
+    "coderaven": "dist/cli.js"
+  },
+  "main": "dist/cli.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "open": "^8.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
