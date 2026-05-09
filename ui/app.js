@@ -85,14 +85,20 @@
         const open = r.comments.filter((c) => !c.resolved).length;
         const li = document.createElement("li");
         li.innerHTML = `
-          <div>
-            <div class="branch">${escapeHtml(r.branch)} <span class="muted">vs ${escapeHtml(r.baseBranch)}</span></div>
-            <div class="meta-line">${escapeHtml(r.commit)} · ${fmtTime(r.createdAt)}</div>
-          </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <span class="count">${open} open / ${r.comments.length} total</span>
-            <a class="btn" href="/review/${encodeURIComponent(r.id)}">Open</a>
-          </div>
+          <a class="review-row" href="/review/${encodeURIComponent(r.id)}">
+            <div>
+              <div class="branch">${escapeHtml(r.branch)} <span class="muted">vs ${escapeHtml(r.baseBranch)}</span></div>
+              <div class="meta-line">${escapeHtml(r.commit)} · ${fmtTime(r.createdAt)}</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span class="count">
+                <svg class="count-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                ${open} open / ${r.comments.length} total
+              </span>
+            </div>
+          </a>
         `;
         list.appendChild(li);
       }
