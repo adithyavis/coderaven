@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>coderaven · review</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">coderaven</a>
+    <span class="subtitle">local code reviews</span>
+  </header>
+  <main class="page">
+    <a class="back" href="/">&larr; All reviews</a>
+    <div id="meta" class="meta"></div>
+    <div id="loading" class="muted">Loading…</div>
+    <div id="comments"></div>
+  </main>
+  <script src="/app.js"></script>
+  <script>coderaven.renderReview();</script>
+</body>
+</html>
