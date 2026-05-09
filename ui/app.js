@@ -35,16 +35,24 @@
   };
 
   const escapeHtml = (s) =>
-    String(s).replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    }[c]));
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
 
   const fmtTime = (iso) => {
-    try { return new Date(iso).toLocaleString(); } catch { return iso; }
+    try {
+      return new Date(iso).toLocaleString();
+    } catch {
+      return iso;
+    }
   };
 
   const reviewIdFromPath = () => {
@@ -61,7 +69,6 @@
     return name.slice(0, 2).toUpperCase();
   };
 
-  // ===== Index page =====
   async function renderIndex() {
     const list = document.getElementById("review-list");
     const empty = document.getElementById("empty");
@@ -69,7 +76,10 @@
     async function refresh() {
       const reviews = await api.listReviews();
       list.innerHTML = "";
-      if (!reviews.length) { empty.classList.remove("hidden"); return; }
+      if (!reviews.length) {
+        empty.classList.remove("hidden");
+        return;
+      }
       empty.classList.add("hidden");
       for (const r of reviews) {
         const open = r.comments.filter((c) => !c.resolved).length;
@@ -95,7 +105,6 @@
     es.addEventListener("review.removed", refresh);
   }
 
-  // ===== Hunk rendering =====
   function renderHunkRows(hunkLines, opts) {
     const targetStart = opts && opts.targetStart;
     const targetEnd = opts && opts.targetEnd;
@@ -144,7 +153,6 @@
     return html;
   }
 
-  // ===== Single comment thread =====
   function renderThread(review, c) {
     const div = document.createElement("div");
     div.className = "thread" + (c.resolved ? " resolved" : "");
@@ -154,24 +162,29 @@
     const sev = (c.severity || "info").toLowerCase();
     const author = "claude (raven)";
 
-    const hunkHtml = c.contextHunk && c.contextHunk.length
-      ? `<div class="hunk">${renderHunkRows(c.contextHunk, { targetStart: c.lineStart, targetEnd: c.lineEnd })}</div>`
-      : `<div class="hunk-empty">No diff context available for ${escapeHtml(c.filepath)}:${lineRange}</div>`;
+    const hunkHtml =
+      c.contextHunk && c.contextHunk.length
+        ? `<div class="hunk">${renderHunkRows(c.contextHunk, { targetStart: c.lineStart, targetEnd: c.lineEnd })}</div>`
+        : `<div class="hunk-empty">No diff context available for ${escapeHtml(c.filepath)}:${lineRange}</div>`;
 
     const suggestionHtml =
-      c.suggestedCode && (c.originalLines && c.originalLines.length)
+      c.suggestedCode && c.originalLines && c.originalLines.length
         ? `<div class="suggestion">
              <div class="suggestion-header"><span>Suggested change</span><span class="muted">${escapeHtml(c.filepath)}:${lineRange}</span></div>
              ${renderSuggestionDiff(c.originalLines, c.suggestedCode, c.lineStart)}
            </div>`
         : c.suggestedCode
-        ? `<div class="suggestion">
+          ? `<div class="suggestion">
              <div class="suggestion-header"><span>Suggested change</span></div>
-             <div class="suggestion-diff hunk">${(String(c.suggestedCode).split("\n")
-               .map((t, i) => `<div class="hunk-row add"><div class="lineno mono">${(c.lineStart || 1) + i}</div><div class="code mono">${escapeHtml("+" + t)}</div></div>`)
-               .join(""))}</div>
+             <div class="suggestion-diff hunk">${String(c.suggestedCode)
+               .split("\n")
+               .map(
+                 (t, i) =>
+                   `<div class="hunk-row add"><div class="lineno mono">${(c.lineStart || 1) + i}</div><div class="code mono">${escapeHtml("+" + t)}</div></div>`,
+               )
+               .join("")}</div>
            </div>`
-        : "";
+          : "";
 
     div.innerHTML = `
       <div class="file-header">
@@ -221,8 +234,11 @@
     }
 
     div.querySelector(".js-resolve").addEventListener("click", async () => {
-      try { await api.toggleResolve(review.id, c.id, !c.resolved); }
-      catch (e) { alert("Failed: " + e.message); }
+      try {
+        await api.toggleResolve(review.id, c.id, !c.resolved);
+      } catch (e) {
+        alert("Failed: " + e.message);
+      }
     });
     const form = div.querySelector(".reply-form");
     div.querySelector(".js-reply-toggle").addEventListener("click", () => {
@@ -247,7 +263,6 @@
     return div;
   }
 
-  // ===== Single review page =====
   async function renderReview() {
     const id = reviewIdFromPath();
     const meta = document.getElementById("meta");

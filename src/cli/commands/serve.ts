@@ -1,6 +1,6 @@
-import { isInsideGitRepo, repoRoot } from "../git";
-import { startServer } from "../server/server";
-import { writePid } from "../server/pid";
+import { isInsideGitRepo, repoRoot } from "../../git";
+import { startServer } from "../../server/server";
+import { writePid } from "../../server/pid";
 
 const DEFAULT_PORT = 6677;
 

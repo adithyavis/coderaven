@@ -22,7 +22,12 @@ const STATIC_TYPES: Record<string, string> = {
   ".ico": "image/x-icon",
 };
 
-function send(res: ServerResponse, status: number, body: string | Buffer, contentType: string): void {
+function send(
+  res: ServerResponse,
+  status: number,
+  body: string | Buffer,
+  contentType: string,
+): void {
   res.writeHead(status, { "Content-Type": contentType });
   res.end(body);
 }
@@ -70,7 +75,11 @@ export interface RouteContext {
   hub: SseHub;
 }
 
-export async function handle(req: IncomingMessage, res: ServerResponse, ctx: RouteContext): Promise<void> {
+export async function handle(
+  req: IncomingMessage,
+  res: ServerResponse,
+  ctx: RouteContext,
+): Promise<void> {
   const url = new URL(req.url ?? "/", "http://localhost");
   const p = url.pathname;
   const method = req.method ?? "GET";

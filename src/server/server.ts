@@ -8,7 +8,10 @@ export interface ServerHandles {
   close(): Promise<void>;
 }
 
-export async function startServer(opts: { repoRoot: string; port: number }): Promise<ServerHandles> {
+export async function startServer(opts: {
+  repoRoot: string;
+  port: number;
+}): Promise<ServerHandles> {
   const hub = new SseHub();
   const watcher = startWatcher(opts.repoRoot, hub);
 

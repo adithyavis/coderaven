@@ -101,7 +101,10 @@ export function readReviewFile(file: string): StoredReview {
   return JSON.parse(raw) as StoredReview;
 }
 
-export function findReviewById(repoRoot: string, id: string): { review: StoredReview; file: string } | undefined {
+export function findReviewById(
+  repoRoot: string,
+  id: string,
+): { review: StoredReview; file: string } | undefined {
   for (const f of listReviewFiles(repoRoot)) {
     try {
       const r = readReviewFile(f);

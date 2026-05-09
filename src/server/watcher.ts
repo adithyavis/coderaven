@@ -10,9 +10,15 @@ export function startWatcher(repoRoot: string, hub: SseHub): FSWatcher {
     awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 },
   });
 
-  watcher.on("add", (p) => hub.broadcast({ type: "review.added", data: { file: path.basename(p) } }));
-  watcher.on("change", (p) => hub.broadcast({ type: "review.changed", data: { file: path.basename(p) } }));
-  watcher.on("unlink", (p) => hub.broadcast({ type: "review.removed", data: { file: path.basename(p) } }));
+  watcher.on("add", (p) =>
+    hub.broadcast({ type: "review.added", data: { file: path.basename(p) } }),
+  );
+  watcher.on("change", (p) =>
+    hub.broadcast({ type: "review.changed", data: { file: path.basename(p) } }),
+  );
+  watcher.on("unlink", (p) =>
+    hub.broadcast({ type: "review.removed", data: { file: path.basename(p) } }),
+  );
 
   return watcher;
 }

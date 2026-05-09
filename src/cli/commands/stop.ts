@@ -14,7 +14,7 @@ export async function runStop(): Promise<void> {
   try {
     process.kill(info.pid, "SIGTERM");
     process.stdout.write(`Stopped server (pid ${info.pid}, port ${info.port}).\n`);
-  } catch (err) {
+  } catch {
     process.stdout.write(`Server pid ${info.pid} was not running.\n`);
   }
   clearPid(root);

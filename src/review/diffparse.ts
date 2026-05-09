@@ -40,7 +40,15 @@ export function parseUnifiedDiff(diff: string): FileDiff[] {
     }
 
     if (!current) continue;
-    if (ln.startsWith("--- ") || ln.startsWith("+++ ") || ln.startsWith("index ") || ln.startsWith("new file") || ln.startsWith("deleted file") || ln.startsWith("similarity ") || ln.startsWith("rename ")) {
+    if (
+      ln.startsWith("--- ") ||
+      ln.startsWith("+++ ") ||
+      ln.startsWith("index ") ||
+      ln.startsWith("new file") ||
+      ln.startsWith("deleted file") ||
+      ln.startsWith("similarity ") ||
+      ln.startsWith("rename ")
+    ) {
       continue;
     }
 

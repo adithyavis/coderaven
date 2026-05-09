@@ -52,11 +52,7 @@ export async function runReview(opts: ReviewOptions): Promise<void> {
   process.stdout.write(`           calling claude...\n`);
   let output;
   try {
-    fs.writeFileSync(
-      path.join(coderavenDir(root), ".last-prompt.txt"),
-      prompt,
-      "utf8",
-    );
+    fs.writeFileSync(path.join(coderavenDir(root), ".last-prompt.txt"), prompt, "utf8");
     const r = await runClaudeReview(prompt);
     output = r.output;
     fs.writeFileSync(
@@ -67,7 +63,9 @@ export async function runReview(opts: ReviewOptions): Promise<void> {
   } catch (err) {
     const debugPath = path.join(coderavenDir(root), ".last-claude-error.txt");
     fs.writeFileSync(debugPath, err instanceof Error ? err.message : String(err), "utf8");
-    process.stderr.write(`coderaven: review failed. Debug info written to ${path.relative(root, debugPath)}\n`);
+    process.stderr.write(
+      `coderaven: review failed. Debug info written to ${path.relative(root, debugPath)}\n`,
+    );
     throw err;
   }
   process.stdout.write(`           got ${output.comments.length} comment(s)\n`);

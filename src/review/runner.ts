@@ -55,7 +55,9 @@ function extractStructuredOutput(claudeResult: unknown): RawReviewOutput {
     if (Array.isArray(p) || ("filepath" in p && "lineStart" in p)) {
       throw new Error("Model returned a comment list directly; expected { comments: [...] }");
     }
-    throw new Error(`Parsed object missing 'comments' array. Got keys: ${Object.keys(p).join(", ")}`);
+    throw new Error(
+      `Parsed object missing 'comments' array. Got keys: ${Object.keys(p).join(", ")}`,
+    );
   }
 
   return parsed as RawReviewOutput;
@@ -83,7 +85,9 @@ export async function runClaudeReview(prompt: string): Promise<RunResult> {
   }
 
   if (process.env["CODERAVEN_DEBUG"] === "1") {
-    process.stderr.write(`\ncoderaven debug: claude ${args.map((a) => (a.includes(" ") ? JSON.stringify(a) : a)).join(" ")}\n`);
+    process.stderr.write(
+      `\ncoderaven debug: claude ${args.map((a) => (a.includes(" ") ? JSON.stringify(a) : a)).join(" ")}\n`,
+    );
     process.stderr.write(`coderaven debug: prompt length = ${prompt.length} chars\n`);
   }
 
@@ -104,7 +108,11 @@ export async function runClaudeReview(prompt: string): Promise<RunResult> {
 
     child.on("error", (err) => {
       if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-        reject(new Error("`claude` CLI not found on PATH. Install Claude Code first: https://claude.ai/code"));
+        reject(
+          new Error(
+            "`claude` CLI not found on PATH. Install Claude Code first: https://claude.ai/code",
+          ),
+        );
       } else {
         reject(err);
       }
