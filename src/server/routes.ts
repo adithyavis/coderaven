@@ -19,6 +19,7 @@ const STATIC_TYPES: Record<string, string> = {
   ".js": "application/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".ico": "image/x-icon",
 };
 
 function send(res: ServerResponse, status: number, body: string | Buffer, contentType: string): void {
