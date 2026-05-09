@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.log
+
+# Local server bookkeeping (committed reviews stay tracked)
+.coderaven/.server.pid
+.coderaven/.server.log
