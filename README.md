@@ -1,6 +1,10 @@
-# coderaven
+<p align="center">
+  <img src="assets/logo.png" alt="coderaven logo" width="180" />
+</p>
 
-Run local, git-syncable code reviews locally 🚀
+<h1 align="center">coderaven</h1>
+
+<p align="center">Run local, git-syncable code reviews locally 🚀</p>
 
 `coderaven review` leverages claude code to run a structured AI review against the diff between your
 current branch and its base, writes JSON findings to `.coderaven/reviews/`,
