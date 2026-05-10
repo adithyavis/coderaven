@@ -60,6 +60,71 @@
     return m ? decodeURIComponent(m[1]) : undefined;
   };
 
+  const EXT_TO_LANGUAGE = {
+    ts: "typescript",
+    tsx: "typescript",
+    js: "javascript",
+    jsx: "javascript",
+    mjs: "javascript",
+    cjs: "javascript",
+    py: "python",
+    go: "go",
+    rs: "rust",
+    java: "java",
+    kt: "kotlin",
+    swift: "swift",
+    rb: "ruby",
+    php: "php",
+    cs: "csharp",
+    c: "c",
+    h: "c",
+    cpp: "cpp",
+    cc: "cpp",
+    cxx: "cpp",
+    hpp: "cpp",
+    hh: "cpp",
+    md: "markdown",
+    markdown: "markdown",
+    json: "json",
+    yaml: "yaml",
+    yml: "yaml",
+    html: "xml",
+    htm: "xml",
+    xml: "xml",
+    svg: "xml",
+    css: "css",
+    scss: "scss",
+    sh: "bash",
+    bash: "bash",
+    zsh: "bash",
+    sql: "sql",
+    toml: "ini",
+    ini: "ini",
+    diff: "diff",
+    dockerfile: "dockerfile",
+    makefile: "makefile",
+  };
+
+  function languageFromFilepath(filepath) {
+    const m = String(filepath || "").match(/\.([a-zA-Z0-9]+)$/);
+    if (!m) return undefined;
+    return EXT_TO_LANGUAGE[m[1].toLowerCase()];
+  }
+
+  // Per-line syntax highlight. Multi-line constructs (template strings, block
+  // comments) won't carry state across rows — accepted trade-off since each
+  // hunk row renders independently.
+  function highlightCode(text, language) {
+    if (!language || !window.hljs || !window.hljs.getLanguage(language)) {
+      return escapeHtml(text);
+    }
+    try {
+      return window.hljs.highlight(text, { language, ignoreIllegals: true }).value;
+    } catch {
+      return escapeHtml(text);
+    }
+  }
+
   const initials = (str) => {
     const m = String(str || "").match(/^([^\s<]+)/);
     if (!m) return "?";
@@ -111,31 +176,22 @@
     es.addEventListener("review.removed", refresh);
   }
 
-  function renderHunkRows(hunkLines, opts) {
-    const targetStart = opts && opts.targetStart;
-    const targetEnd = opts && opts.targetEnd;
+  function renderHunkRows(hunkLines, language) {
     let html = "";
     for (const l of hunkLines) {
-      const cls = l.type;
-      const isTarget =
-        l.type !== "remove" &&
-        l.newLine !== undefined &&
-        targetStart !== undefined &&
-        l.newLine >= targetStart &&
-        l.newLine <= targetEnd;
       const oldNum = l.oldLine != null ? l.oldLine : "";
       const newNum = l.newLine != null ? l.newLine : "";
       const prefix = l.type === "add" ? "+" : l.type === "remove" ? "-" : " ";
-      html += `<div class="hunk-row ${cls}${isTarget ? " target" : ""}">`;
+      html += `<div class="hunk-row ${l.type}">`;
       html += `<div class="lineno mono">${oldNum}</div>`;
       html += `<div class="lineno mono">${newNum}</div>`;
-      html += `<div class="code mono">${escapeHtml(prefix + l.text)}</div>`;
+      html += `<div class="code mono">${escapeHtml(prefix)}${highlightCode(l.text, language)}</div>`;
       html += `</div>`;
     }
     return html;
   }
 
-  function renderSuggestionDiff(originalLines, suggestedCode, startLineno) {
+  function renderSuggestionDiff(originalLines, suggestedCode, startLineno, language) {
     const oldLines = (originalLines || []).map((t) => t);
     const newLines = String(suggestedCode || "").split("\n");
     let html = `<div class="suggestion-diff hunk">`;
@@ -143,7 +199,7 @@
     for (const t of oldLines) {
       html += `<div class="hunk-row remove">`;
       html += `<div class="lineno mono">${n}</div>`;
-      html += `<div class="code mono">${escapeHtml("-" + t)}</div>`;
+      html += `<div class="code mono">${escapeHtml("-")}${highlightCode(t, language)}</div>`;
       html += `</div>`;
       n++;
     }
@@ -151,7 +207,7 @@
     for (const t of newLines) {
       html += `<div class="hunk-row add">`;
       html += `<div class="lineno mono">${m}</div>`;
-      html += `<div class="code mono">${escapeHtml("+" + t)}</div>`;
+      html += `<div class="code mono">${escapeHtml("+")}${highlightCode(t, language)}</div>`;
       html += `</div>`;
       m++;
     }
@@ -168,17 +224,18 @@
     const vscodeUrl = `vscode://file/${encodeURI(absPath)}:${c.lineStart}`;
     const sev = (c.severity || "info").toLowerCase();
     const author = "coderaven";
+    const language = languageFromFilepath(c.filepath);
 
     const hunkHtml =
       c.contextHunk && c.contextHunk.length
-        ? `<div class="hunk">${renderHunkRows(c.contextHunk, { targetStart: c.lineStart, targetEnd: c.lineEnd })}</div>`
+        ? `<div class="hunk">${renderHunkRows(c.contextHunk, language)}</div>`
         : `<div class="hunk-empty">No diff context available for ${escapeHtml(c.filepath)}:${lineRange}</div>`;
 
     const suggestionHtml =
       c.suggestedCode && c.originalLines && c.originalLines.length
         ? `<div class="suggestion">
              <div class="suggestion-header"><span>Suggested change</span><span class="muted">${escapeHtml(c.filepath)}:${lineRange}</span></div>
-             ${renderSuggestionDiff(c.originalLines, c.suggestedCode, c.lineStart)}
+             ${renderSuggestionDiff(c.originalLines, c.suggestedCode, c.lineStart, language)}
            </div>`
         : c.suggestedCode
           ? `<div class="suggestion">
@@ -187,7 +244,7 @@
                .split("\n")
                .map(
                  (t, i) =>
-                   `<div class="hunk-row add"><div class="lineno mono">${(c.lineStart || 1) + i}</div><div class="code mono">${escapeHtml("+" + t)}</div></div>`,
+                   `<div class="hunk-row add"><div class="lineno mono">${(c.lineStart || 1) + i}</div><div class="code mono">${escapeHtml("+")}${highlightCode(t, language)}</div></div>`,
                )
                .join("")}</div>
            </div>`
