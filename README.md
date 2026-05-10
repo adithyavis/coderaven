@@ -4,7 +4,7 @@
 
 <h1 align="center">coderaven</h1>
 
-<p align="center">Run git-syncable code reviews using claude code locally 🚀</p>
+<p align="center">Run git-syncable code reviews on top of claude code locally 🚀</p>
 
 `coderaven review` leverages claude code to run a structured AI review against the diff between your
 current branch and its base, writes JSON findings to `.coderaven/reviews/`,
