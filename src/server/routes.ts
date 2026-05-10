@@ -112,7 +112,7 @@ export async function handle(
       sendJSON(res, 404, { error: "review not found" });
       return;
     }
-    sendJSON(res, 200, found.review);
+    sendJSON(res, 200, { ...found.review, repoRoot: ctx.repoRoot });
     return;
   }
 

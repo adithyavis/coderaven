@@ -20,7 +20,7 @@ function logFile(repoRoot: string): string {
   return path.join(coderavenDir(repoRoot), LOG_FILENAME);
 }
 
-function isProcessAlive(pid: number): boolean {
+export function isProcessAlive(pid: number): boolean {
   try {
     process.kill(pid, 0);
     return true;

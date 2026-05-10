@@ -1,4 +1,5 @@
 import * as http from "http";
+import { Socket } from "net";
 import { handle } from "./routes";
 import { SseHub } from "./sse";
 import { startWatcher } from "./watcher";
@@ -7,6 +8,8 @@ import { clearPid } from "./pid";
 export interface ServerHandles {
   close(): Promise<void>;
 }
+
+const SHUTDOWN_GRACE_MS = 500;
 
 export async function startServer(opts: {
   repoRoot: string;
@@ -29,6 +32,12 @@ export async function startServer(opts: {
     }
   });
 
+  const sockets = new Set<Socket>();
+  server.on("connection", (sock) => {
+    sockets.add(sock);
+    sock.on("close", () => sockets.delete(sock));
+  });
+
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
     server.listen(opts.port, "127.0.0.1", () => {
@@ -40,7 +49,15 @@ export async function startServer(opts: {
   const cleanup = async () => {
     hub.shutdown();
     await watcher.close();
-    await new Promise<void>((r) => server.close(() => r()));
+    await new Promise<void>((resolve) => {
+      const force = setTimeout(() => {
+        for (const s of sockets) s.destroy();
+      }, SHUTDOWN_GRACE_MS);
+      server.close(() => {
+        clearTimeout(force);
+        resolve();
+      });
+    });
     clearPid(opts.repoRoot);
   };
 
