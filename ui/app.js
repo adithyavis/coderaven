@@ -309,9 +309,8 @@
       <div class="replies"></div>
       <div class="actions">
         <button class="btn js-resolve">${c.resolved ? "Reopen thread" : "Resolve thread"}</button>
-        <button class="btn ghost js-reply-toggle">Reply</button>
       </div>
-      <div class="reply-form">
+      <div class="reply-form open">
         <textarea placeholder="Reply…"></textarea>
         <div class="row">
           <button class="btn ghost js-reply-cancel">Cancel</button>
@@ -343,10 +342,6 @@
       }
     });
     const form = div.querySelector(".reply-form");
-    div.querySelector(".js-reply-toggle").addEventListener("click", () => {
-      form.classList.toggle("open");
-      if (form.classList.contains("open")) form.querySelector("textarea").focus();
-    });
     div.querySelector(".js-reply-cancel").addEventListener("click", () => {
       form.classList.remove("open");
     });
