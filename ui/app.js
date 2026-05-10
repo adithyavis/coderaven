@@ -164,7 +164,8 @@
     div.className = "thread" + (c.resolved ? " resolved" : "");
     div.dataset.commentId = c.id;
     const lineRange = c.lineStart === c.lineEnd ? `${c.lineStart}` : `${c.lineStart}-${c.lineEnd}`;
-    const vscodeUrl = `vscode://file/${encodeURI(c.filepath)}:${c.lineStart}`;
+    const absPath = review.repoRoot ? `${review.repoRoot}/${c.filepath}` : c.filepath;
+    const vscodeUrl = `vscode://file/${encodeURI(absPath)}:${c.lineStart}`;
     const sev = (c.severity || "info").toLowerCase();
     const author = "claude (raven)";
 
