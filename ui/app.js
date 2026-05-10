@@ -60,6 +60,37 @@
     return m ? decodeURIComponent(m[1]) : undefined;
   };
 
+  const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+  // Use role="button" span (not <button>) so the copy control can sit safely
+  // inside an <a class="review-row"> on the index page without nesting violations.
+  function copyButtonHtml(text) {
+    const safe = escapeHtml(text);
+    return `<span class="copy-btn" role="button" tabindex="0" data-copy="${safe}" aria-label="Copy ${safe}" title="Copy">${COPY_ICON_SVG}</span>`;
+  }
+
+  async function handleCopyActivation(e) {
+    const btn = e.target.closest(".copy-btn");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const text = btn.dataset.copy;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add("copied");
+      setTimeout(() => btn.classList.remove("copied"), 1200);
+    } catch {
+      // clipboard API unavailable — silent fail
+    }
+  }
+  document.addEventListener("click", handleCopyActivation);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (!e.target.closest(".copy-btn")) return;
+    handleCopyActivation(e);
+  });
+
   const EXT_TO_LANGUAGE = {
     ts: "typescript",
     tsx: "typescript",
@@ -152,7 +183,15 @@
         li.innerHTML = `
           <a class="review-row" href="/review/${encodeURIComponent(r.id)}">
             <div>
-              <div class="branch">${escapeHtml(r.branch)} <span class="muted">vs ${escapeHtml(r.baseBranch)}</span></div>
+              <div class="branch">
+                <span class="branch-pill">${escapeHtml(r.branch)}</span>
+                ${copyButtonHtml(r.branch)}
+                <svg class="branch-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+                <span class="branch-pill">${escapeHtml(r.baseBranch)}</span>
+              </div>
               <div class="meta-line">${escapeHtml(r.commit)} · ${fmtTime(r.createdAt)}</div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
@@ -338,12 +377,25 @@
         loading.classList.add("hidden");
         const open = r.comments.filter((c) => !c.resolved).length;
         meta.innerHTML = `
-          <div class="row">
-            <div><span class="k">branch</span><strong>${escapeHtml(r.branch)}</strong></div>
-            <div><span class="k">base</span>${escapeHtml(r.baseBranch)}</div>
-            <div><span class="k">commit</span><span class="mono">${escapeHtml(r.commit)}</span></div>
-            <div><span class="k">created</span>${fmtTime(r.createdAt)}</div>
-            <div><span class="k">comments</span>${open} open / ${r.comments.length} total</div>
+          <div class="meta-content">
+            <div>
+              <div class="branch">
+                <span class="branch-pill">${escapeHtml(r.branch)}</span>
+                ${copyButtonHtml(r.branch)}
+                <svg class="branch-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+                <span class="branch-pill">${escapeHtml(r.baseBranch)}</span>
+              </div>
+              <div class="meta-line"><span class="mono">${escapeHtml(r.commit)}</span> · ${fmtTime(r.createdAt)}</div>
+            </div>
+            <span class="count">
+              <svg class="count-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              ${open} open / ${r.comments.length} total
+            </span>
           </div>
         `;
         root.innerHTML = "";
