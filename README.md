@@ -15,6 +15,14 @@ and serves a small web UI for triaging.
 - Node.js 18+
 - [Claude Code](https://claude.ai/code) installed and authenticated (`claude` on PATH)
 
+## Installing coderaven
+
+- Install dependencies:
+
+  ```bash
+  npm install -g coderaven
+  ```
+
 ## Setting up locally
 
 - Install dependencies:
