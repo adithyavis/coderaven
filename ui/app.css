@@ -339,6 +339,16 @@ pre,
   font-size: 11px;
   font-weight: 600;
   flex: 0 0 auto;
+  overflow: hidden;
+}
+.avatar.avatar-bot {
+  background: #fff;
+  padding: 2px;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .author {
   font-weight: 600;

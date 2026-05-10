@@ -300,7 +300,7 @@
       ${hunkHtml}
       <div class="comment-block">
         <div class="comment-head">
-          <span class="avatar">${escapeHtml(initials(author))}</span>
+          <span class="avatar avatar-bot"><img src="/logo.png" alt="coderaven" /></span>
           <span class="author">${escapeHtml(author)}</span>
         </div>
         <p class="comment-message">${escapeHtml(c.message)}</p>
