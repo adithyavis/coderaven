@@ -206,7 +206,6 @@
         <div class="comment-head">
           <span class="avatar">${escapeHtml(initials(author))}</span>
           <span class="author">${escapeHtml(author)}</span>
-          <span class="handle">${escapeHtml(c.id)}</span>
         </div>
         <p class="comment-message">${escapeHtml(c.message)}</p>
         ${suggestionHtml}
