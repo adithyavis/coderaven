@@ -167,7 +167,7 @@
     const absPath = review.repoRoot ? `${review.repoRoot}/${c.filepath}` : c.filepath;
     const vscodeUrl = `vscode://file/${encodeURI(absPath)}:${c.lineStart}`;
     const sev = (c.severity || "info").toLowerCase();
-    const author = "claude (raven)";
+    const author = "coderaven";
 
     const hunkHtml =
       c.contextHunk && c.contextHunk.length
