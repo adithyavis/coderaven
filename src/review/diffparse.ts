@@ -105,6 +105,30 @@ export interface ExtractContextOptions {
   context?: number;
 }
 
+function normalizePath(p: string): string {
+  return p.replace(/^\.?\/+/, "");
+}
+
+function findFileDiff(parsed: FileDiff[], filepath: string): FileDiff | undefined {
+  const target = normalizePath(filepath);
+  const exact = parsed.find(
+    (f) => normalizePath(f.newPath) === target || normalizePath(f.oldPath) === target,
+  );
+  if (exact) return exact;
+  const suffix = "/" + target;
+  const bySuffix = parsed.find(
+    (f) => normalizePath(f.newPath).endsWith(suffix) || normalizePath(f.oldPath).endsWith(suffix),
+  );
+  if (bySuffix) return bySuffix;
+  const base = target.split("/").pop() ?? target;
+  const matches = parsed.filter(
+    (f) =>
+      normalizePath(f.newPath).split("/").pop() === base ||
+      normalizePath(f.oldPath).split("/").pop() === base,
+  );
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
 export function extractContextHunk(
   parsed: FileDiff[],
   opts: ExtractContextOptions,
@@ -112,8 +136,17 @@ export function extractContextHunk(
   const { filepath, newLineStart, newLineEnd } = opts;
   const ctx = opts.context ?? 3;
 
-  const file = parsed.find((f) => f.newPath === filepath || f.oldPath === filepath);
-  if (!file) return undefined;
+  const file = findFileDiff(parsed, filepath);
+  if (!file) {
+    if (process.env["CODERAVEN_DEBUG"] === "1") {
+      process.stderr.write(
+        `coderaven debug: no diff entry matched filepath="${filepath}" — diff has: ${parsed
+          .map((f) => f.newPath)
+          .join(", ")}\n`,
+      );
+    }
+    return undefined;
+  }
 
   let bestHunk: ParsedHunk | undefined;
   for (const h of file.hunks) {
