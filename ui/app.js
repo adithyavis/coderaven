@@ -20,6 +20,17 @@
       );
       return await r.json();
     },
+    async toggleCommentsCollapsed(reviewId, commentId, collapsed) {
+      const r = await fetch(
+        `/api/reviews/${encodeURIComponent(reviewId)}/comments/${encodeURIComponent(commentId)}/collapse-comments`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ collapsed }),
+        },
+      );
+      return await r.json();
+    },
     async reply(reviewId, commentId, body) {
       const r = await fetch(
         `/api/reviews/${encodeURIComponent(reviewId)}/comments/${encodeURIComponent(commentId)}/replies`,
@@ -289,32 +300,59 @@
            </div>`
           : "";
 
+    if (c.commentsCollapsed) div.classList.add("collapsed");
+    const totalCount = 1 + (c.replies || []).length;
+    const uniqueReplyAuthors = [...new Set((c.replies || []).map((r) => r.author))].slice(0, 2);
+    const avatarStackHtml = `
+      <span class="reply-avatars">
+        <span class="mini-avatar mini-avatar-bot"><img src="/logo.png" alt="" /></span>
+        ${uniqueReplyAuthors.map((a) => `<span class="mini-avatar">${escapeHtml(initials(a))}</span>`).join("")}
+      </span>
+    `;
+    const collapsedLabelHtml = `
+      ${avatarStackHtml}
+      <span>${totalCount} ${totalCount === 1 ? "comment" : "comments"}</span>
+    `;
+    const expandedLabelHtml = `<span>Collapse comments</span>`;
+    const chevronSvg = `<svg class="chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const severityRowHtml = `
+      <div class="severity-row">
+        ${c.category ? `<span class="category">${escapeHtml(c.category)}</span>` : ""}
+        <span class="severity ${sev}">${escapeHtml(sev)}</span>
+      </div>
+    `;
+
     div.innerHTML = `
-      <div class="file-header">
-        <div class="path"><a href="${vscodeUrl}">${escapeHtml(c.filepath)}:${lineRange}</a></div>
-        <div class="severity-row">
-          ${c.category ? `<span class="category">${escapeHtml(c.category)}</span>` : ""}
-          <span class="severity ${sev}">${escapeHtml(sev)}</span>
+      <div class="thread-toolbar">
+        <button type="button" class="js-collapse-toggle">
+          ${chevronSvg}
+          <span class="js-toolbar-label">${c.commentsCollapsed ? collapsedLabelHtml : expandedLabelHtml}</span>
+        </button>
+        ${severityRowHtml}
+      </div>
+      <div class="thread-content">
+        <div class="file-header">
+          <div class="path"><a href="${vscodeUrl}">${escapeHtml(c.filepath)}:${lineRange}</a></div>
         </div>
-      </div>
-      ${hunkHtml}
-      <div class="comment-block">
-        <div class="comment-head">
-          <span class="avatar avatar-bot"><img src="/logo.png" alt="coderaven" /></span>
-          <span class="author">${escapeHtml(author)}</span>
+        ${hunkHtml}
+        <div class="comment-block">
+          <div class="comment-head">
+            <span class="avatar avatar-bot"><img src="/logo.png" alt="coderaven" /></span>
+            <span class="author">${escapeHtml(author)}</span>
+          </div>
+          <p class="comment-message">${escapeHtml(c.message)}</p>
+          ${suggestionHtml}
         </div>
-        <p class="comment-message">${escapeHtml(c.message)}</p>
-        ${suggestionHtml}
-      </div>
-      <div class="replies"></div>
-      <div class="actions">
-        <button class="btn js-resolve">${c.resolved ? "Reopen thread" : "Resolve thread"}</button>
-      </div>
-      <div class="reply-form open">
-        <textarea placeholder="Reply…"></textarea>
-        <div class="row">
-          <button class="btn ghost js-reply-cancel">Cancel</button>
-          <button class="btn primary js-reply-submit">Send</button>
+        <div class="replies"></div>
+        <div class="actions">
+          <button class="btn js-resolve">${c.resolved ? "Reopen thread" : "Resolve thread"}</button>
+        </div>
+        <div class="reply-form open">
+          <textarea placeholder="Reply…"></textarea>
+          <div class="row">
+            <button class="btn ghost js-reply-cancel">Cancel</button>
+            <button class="btn primary js-reply-submit">Send</button>
+          </div>
         </div>
       </div>
     `;
@@ -337,6 +375,13 @@
     div.querySelector(".js-resolve").addEventListener("click", async () => {
       try {
         await api.toggleResolve(review.id, c.id, !c.resolved);
+      } catch (e) {
+        alert("Failed: " + e.message);
+      }
+    });
+    div.querySelector(".js-collapse-toggle").addEventListener("click", async () => {
+      try {
+        await api.toggleCommentsCollapsed(review.id, c.id, !c.commentsCollapsed);
       } catch (e) {
         alert("Failed: " + e.message);
       }

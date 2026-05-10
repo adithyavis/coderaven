@@ -56,6 +56,7 @@ export interface StoredComment extends RawComment {
   replies: Reply[];
   contextHunk?: HunkLineStored[];
   originalLines?: string[];
+  commentsCollapsed?: boolean;
 }
 
 export interface StoredReview {

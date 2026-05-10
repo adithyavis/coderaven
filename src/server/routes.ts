@@ -134,6 +134,24 @@ export async function handle(
     return;
   }
 
+  const collapseMatch = p.match(/^\/api\/reviews\/([^/]+)\/comments\/([^/]+)\/collapse-comments$/);
+  if (method === "POST" && collapseMatch) {
+    const found = findReviewById(ctx.repoRoot, collapseMatch[1]);
+    if (!found) {
+      sendJSON(res, 404, { error: "review not found" });
+      return;
+    }
+    const body = await readBody(req).catch(() => "");
+    const desired = body ? (JSON.parse(body) as { collapsed?: boolean }) : {};
+    const updated = updateReview(found.file, (r) => {
+      const c = r.comments.find((x) => x.id === collapseMatch[2]);
+      if (!c) throw new Error("comment not found");
+      c.commentsCollapsed = desired.collapsed ?? !c.commentsCollapsed;
+    });
+    sendJSON(res, 200, updated);
+    return;
+  }
+
   const replyMatch = p.match(/^\/api\/reviews\/([^/]+)\/comments\/([^/]+)\/replies$/);
   if (method === "POST" && replyMatch) {
     const found = findReviewById(ctx.repoRoot, replyMatch[1]);

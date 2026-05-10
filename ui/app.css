@@ -212,6 +212,75 @@ pre,
 .thread.resolved .hunk {
   display: none;
 }
+.thread.collapsed .thread-content {
+  display: none;
+}
+
+.thread-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+.thread.collapsed .thread-toolbar {
+  border-bottom: none;
+}
+.js-collapse-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.js-collapse-toggle:hover {
+  background: rgba(79, 179, 255, 0.1);
+}
+.js-collapse-toggle .chevron {
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.thread.collapsed .js-collapse-toggle .chevron {
+  transform: rotate(-90deg);
+}
+.reply-avatars {
+  display: inline-flex;
+}
+.mini-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--avatar);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -4px;
+  border: 2px solid var(--panel-2);
+  overflow: hidden;
+}
+.mini-avatar-bot {
+  background: #fff;
+  padding: 1px;
+}
+.mini-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.reply-avatars .mini-avatar:first-child {
+  margin-left: 0;
+}
 
 /* file header */
 .file-header {
@@ -230,7 +299,7 @@ pre,
 .file-header .path a:hover {
   color: var(--accent);
 }
-.file-header .severity-row {
+.severity-row {
   display: flex;
   gap: 8px;
   align-items: center;
