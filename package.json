@@ -2,6 +2,26 @@
   "name": "coderaven",
   "version": "0.1.0",
   "description": "Local, git-syncable code review wrapper around Claude Code",
+  "keywords": [
+    "code-review",
+    "claude",
+    "claude-code",
+    "ai",
+    "review",
+    "git",
+    "cli",
+    "local"
+  ],
+  "homepage": "https://github.com/adithyavis/coderaven#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adithyavis/coderaven.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adithyavis/coderaven/issues"
+  },
+  "license": "MIT",
+  "author": "adithyavis",
   "bin": {
     "coderaven": "dist/cli.js"
   },
@@ -16,7 +36,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "lint-staged": {
     "*.{ts,js}": [
@@ -32,7 +53,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "ui",
+    "README.md",
+    "LICENSE"
   ],
   "dependencies": {
     "chokidar": "^3.6.0",
