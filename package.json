@@ -23,14 +23,14 @@
   "license": "MIT",
   "author": "adithyavis",
   "bin": {
-    "coderaven": "dist/cli.js"
+    "coderaven": "dist/cli/index.js"
   },
-  "main": "dist/cli.js",
+  "main": "dist/cli/index.js",
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node dist/cli.js",
+    "start": "node dist/cli/index.js",
     "clean": "rm -rf dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
